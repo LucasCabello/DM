@@ -11,7 +11,11 @@ Se suele decir que el origen de los deportes yace en los juegos olímpicos origi
 Nuestro proyecto está enfocado en la predicción de resultados de partidos de fútbol entre equipos de las mejores ligas o divisiones de países europeos, siendo posibles resultados una victoria del equipo local, una derrota o un empate. Para esto buscamos construir un modelo basado en estadísticas de los equipos, resultados históricos y las cuotas o multiplicadores que ofrecen las casas de apuestas.
 
 ### Descripción de los datos
-Una gran cantidad de los datos usados provienen de http://www.football-data.co.uk, un sitio que tiene archivos en csv por cada año y cada liga o división de varios países europeos. Dentro de los csv cada fila corresponde a un partido y cada columna a un atributo del partido, donde la mayoría son datos de casas de apuestas. ****INSERTAR DATOS PARA DESCARGAR Y EXPLICAR LOS OTROS DATOS****
+Una gran cantidad de los datos usados provienen de http://www.football-data.co.uk, un sitio que tiene archivos en csv por cada año y cada liga o división de varios países europeos. Dentro de los csv cada fila corresponde a un partido y cada columna a un atributo del partido, donde la mayoría son datos de casas de apuestas. 
+
+Los datos usados pueden pueden ser descargados de [aquí](https://github.com/LucasCabello/DM/tree/master/datos).
+
+<span style="color:red">****TODO: AGREGAR LOS DATOS QUE FALTAN AL REPOSITORIO Y LAS EXPLICACIONES****</span>
 
 ### Limpieza de datos
 Para realizar una buena exploración de datos fue necesario combinar de diferentes maneras los csvs disponibles en el sitio, y hacer una limpieza para eliminar las pocas filas con datos faltantes. Para todos las combinaciones se utilizó el siguiente script con pequeñas modificaciones:
@@ -68,7 +72,9 @@ print("inter: " + str(len(fnms)) + " columnas de " + str(len(datos)) + " archivo
 print "empty", empty
 ```
 
-****INSERTAR DATOS LIMPIOS PARA DESCARGAR Y EXPLICAR ALGUNA OTRA LIMPIEZA****
+Los datos limpios pueden pueden ser descargados de [aquí](https://github.com/LucasCabello/DM/tree/master/datos_limpios).
+
+<span style="color:red">****TODO: AGREGAR LOS DATOS LIMPIOS QUE FALTAN AL REPOSITORIO Y LAS EXPLICACIONES****</span>
 
 ### Exploración de datos
 ### Resultados
