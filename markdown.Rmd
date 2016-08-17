@@ -1,22 +1,74 @@
 ---
-title: "Predicción Futbol"
+title: "Predecir resultados de partidos de fútbol"
 author: "Lucas Cabello, Andrés Ferrada, Franco Sepúlveda"
-date: "17/08/2016"
+
 output: html_document
 ---
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+### Descripción del Problema
+Se suele decir que el origen de los deportes yace en los juegos olímpicos originales de Grecia, y desde aquellos tiempos hay evidencia que muestra la existencia de apuestas por los eventos. Ahora mas que nunca la tecnología ha impactado todo ámbito de los deportes, y con el desarrollo de técnicas de minería de datos y el fácil acceso a grandes registros históricos es posible pensar en buscar una manera moderna de predecir resultados. 
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+Nuestro proyecto está enfocado en la predicción de resultados de partidos de fútbol entre equipos de las mejores ligas o divisiones de países europeos, siendo posibles resultados una victoria del equipo local, una derrota o un empate. Para esto buscamos construir un modelo basado en estadísticas de los equipos, resultados históricos y las cuotas o multiplicadores que ofrecen las casas de apuestas.
 
-```{r}
-summary(cars)
+### Descripción de los datos
+Una gran cantidad de los datos usados provienen de http://www.football-data.co.uk, un sitio que tiene archivos en csv por cada año y cada liga o división de varios países europeos. Dentro de los csv cada fila corresponde a un partido y cada columna a un atributo del partido, donde la mayoría son datos de casas de apuestas. ****INSERTAR DATOS PARA DESCARGAR Y EXPLICAR LOS OTROS DATOS****
+
+### Limpieza de datos
+Para realizar una buena exploración de datos fue necesario combinar de diferentes maneras los csvs disponibles en el sitio, y hacer una limpieza para eliminar las pocas filas con datos faltantes. Para todos las combinaciones se utilizó el siguiente script con pequeñas modificaciones:
+```{python, eval=FALSE}
+import csv
+
+fnms = []
+
+datos = ["B1.csv", "D1.csv", "E0.csv", "I1.csv", "N1.csv", "P1.csv", "SC0.csv", "SP1-1.csv", "T1.csv", "E0(1).csv", "E0(2).csv", "E0(3).csv", "E0(4).csv", "E0(5).csv", "E0(6).csv", "E0(7).csv", "E0(8).csv", "E0(9).csv", "E0(10).csv", "SC0(1).csv", "SC0(2).csv", "SC0(3).csv", "SC0(4).csv", "SC0(5).csv", "SC0(6).csv", "SC0(7).csv", "SC0(8).csv", "SC0(9).csv", "SC0(10).csv", "SC0(11).csv", "D1(1).csv", "D1(2).csv", "D1(3).csv", "D1(4).csv", "D1(5).csv", "D1(6).csv", "D1(7).csv", "D1(8).csv", "D1(9).csv", "D1(10).csv", "I1(1).csv", "I1(2).csv", "I1(3).csv", "I1(4).csv", "I1(5).csv", "I1(6).csv", "I1(7).csv", "I1(8).csv", "I1(9).csv", "I1(10).csv", "SP1(1).csv", "SP1(2).csv", "SP1(3).csv", "SP1(4).csv", "SP1(5).csv", "SP1(6).csv", "SP1(7).csv", "SP1(8).csv", "SP1(9).csv", "SP1(10).csv", "N1(1).csv", "N1(2).csv", "N1(3).csv", "N1(4).csv", "N1(5).csv", "N1(6).csv", "N1(7).csv", "N1(8).csv", "N1(9).csv", "N1(10).csv", "N1(11).csv", "B1(1).csv", "B1(2).csv", "B1(3).csv", "B1(4).csv", "B1(5).csv", "B1(6).csv", "B1(7).csv", "B1(8).csv", "B1(9).csv", "B1(10).csv", "B1(11).csv", "P1(1).csv", "P1(2).csv", "P1(3).csv", "P1(4).csv", "P1(5).csv", "P1(6).csv", "P1(7).csv", "P1(8).csv", "P1(9).csv", "P1(10).csv", "T1(1).csv", "T1(2).csv", "T1(3).csv", "T1(4).csv", "T1(5).csv", "T1(6).csv", "T1(7).csv", "T1(8).csv", "T1(9).csv", "T1(10).csv", "G1.csv", "G1(1).csv", "G1(2).csv", "G1(3).csv", "G1(4).csv", "G1(5).csv", "G1(6).csv", "G1(7).csv", "G1(8).csv", "G1(9).csv", "G1(10).csv", "F1.csv", "F1(1).csv", "F1(2).csv", "F1(3).csv", "F1(4).csv", "F1(5).csv", "F1(6).csv", "F1(7).csv", "F1(8).csv", "F1(9).csv", "F1(10).csv"]#remplazar por csvs relevantes
+
+for nom in datos:
+  with open(nom, "rb") as csvextra:
+		reader = csv.DictReader(csvextra)
+		for row in reader:
+			print row
+			if len(fnms) == 0:
+				fnms = list(row.keys())
+			else:
+				fnms = list(set(fnms).intersection(set(list(row.keys()))))
+			break
+            
+for p in fnms:
+	print (p)
+	
+print("inter: " + str(len(fnms)) + " elementos")
+
+count = 0
+empty = 0
+with open("europa_global.csv", "w") as nuevo:
+	writer = csv.DictWriter(nuevo, fieldnames=fnms)
+	writer.writeheader()
+	for nom in datos:
+		with open(nom, "rb") as csvextra:
+			reader = csv.DictReader(csvextra)
+			for row in reader:
+				new_row = {}
+				write = True
+				for fn in fnms:
+					new_row[fn] = row[fn].replace("'", "") #por problemas de formato con weka
+					if row[fn] == "":
+						print count, fn, "empty"
+						write = False #comentar esta linea para incluir filas con espacios
+						empty += 1
+						break
+				
+				if write:
+					writer.writerow(new_row)
+					print count, "DONE"
+					count += 1
+
+print "FILE DONE"
+
+print("inter: " + str(len(fnms)) + " columnas de " + str(len(datos)) + " archivos")
+print "empty", empty
 ```
 
-You can also embed plots, for example:
+****INSERTAR DATOS LIMPIOS PARA DESCARGAR Y EXPLICAR ALGUNA OTRA LIMPIEZA****
 
-```{r, echo=FALSE}
-plot(cars)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+### Exploración de datos
+### Resultados
