@@ -110,7 +110,138 @@ print "empty", empty
 
 Los datos limpios pueden pueden ser descargados de [aquí](https://github.com/LucasCabello/DM/tree/master/datos_limpios).
 
-<span style="color:red">****TODO: AGREGAR LOS DATOS LIMPIOS QUE FALTAN AL REPOSITORIO Y LAS EXPLICACIONES****</span>
 
 ### Exploración de datos
+
+####Primer vistazo a los datos
+
+Para este trabajo se buscaron distintos dataset de futbol de ligas europeas. En un inicio partimos con un dataset educativo de kraggle
+
+https://inclass.kaggle.com/c/football-data-challenge
+
+Los datos que se encuentran en esta página corresponden a vectores de este tipo
+
+![](http://i.imgur.com/CYwYaZ2.png)
+
+Donde aparecen datos como fecha, Equipo Home, Equipo Away, cantidad de goles, resultado del partido, resultado de medio tiempo y luego una gran cantidad de numeros que representan las distintas casas de apuestas.
+
+Como primera cosa realizamos una clasificación de cada partido por su variable FTR (full time result) que posee 3 clases H cuando gana el equipo local, A cuando gana el equipo visitante y D cuando existe un empate. Se utilizó el clasificador BayesNetwork ya que en los talleres del curso parecida tener buen desempeño (también ya que soportan múltiples clases) los resultados fueron los siguientes:
+
+![](http://i.imgur.com/d0Vy04V.png)
+
+Es decir nuestro clasificador logra clasificar correctamente el 100% de los datos. Por lo tanto terminamos, ya no hay nada que mejorar y se acabo el proyecto…. No, en realidad sin darnos cuenta colocamos en los datos un valor que decidía el partido. Estos datos eran FTHG y FTAG (full time home goals y full time away goals) cantidades de goles al final del partido. Es decir nuestro clasificador podría decirnos quién ganó, pero tendríamos que esperar hasta el final del partido para que nos dijera.
+
+Revisando el vector de características con mayor cuidado encontramos que poseía muchos valores que solo serian conocidos una vez terminado el partido tales como resultado de medio tiempo, goles medio tiempo, tarjetas rojas, tarjetas amarillas y corners.
+De esta forma solamente queda [resultado Partido .. valores de las distintas casa de apuestas] donde resultado de partido es la variable a clasificar.
+
+Una vez se creó este vector de características se calculó nuevamente para el modelo BayesNetwork
+
+![](http://i.imgur.com/MHyT2At.png)
+
+Estos resultados eran algo más realistas donde se tenía 44% de precisión promedio entre las 3 clases. Es un resultado más que mejorable y esto era el objetivo de nuestro proyecto.
+
+####Sobre las técnicas de entrenamiento y testeo
+
+Sobre los datos en sí son solamente 1500 datos para ese dataset, lo cual es un dataset algo pequeño. Debido a esto no se realizó una partición en train y test data se entrena y testea con cross validation lo cual no es ideal en el sentido de que nuestras mediciones de la efectividad del clasificador estarán sesgadas, pero tenemos más datos para entrenar.
+
+####Primer intento de mejora. Más columnas
+
+Como primera idea para mejorar nuestros resultados fue agregar aún más columnas de casas de apuestas y conseguir más partidos para complementar nuestros 1500 datos. Se logró encontrar más datos de apuestas para la serie A italiana en la página 
+http://www.football-data.co.uk/italym.php
+La cual contenía variados datos de apuestas para incluso años anteriores a la temporada 2014-2015 (que era nuestro dataset inicial), pero se decidió acotarlo a 2015-2014 para utilizar los vectores que ya teníamos. Con estos nuevas columnas se agregan tambien informacion de los partidos anteriores a la fecha, es decir % victorias últimos 5 partidos, % victorias local temporada anterior, % victorias visitante temporada anterior. Con este nuevo modelo se consiguen  los siguientes resultados
+
+####Modelo DecisionTable
+![](http://i.imgur.com/WQnuk35.png)
+
+####Modelo BayesNet
+![](http://i.imgur.com/sfSORrl.png)
+
+Se observa que los resultados con BayesNet no cambiaron prácticamente en el sentido de la precisión promedio, mientras que el nuevo método de decisionTable consiguió un resultado algo mejor clasificando correctamente el 53% de los datos.
+
+
+Aun asi nos pareció que los % de precision eran muy bajos asi que planeamos los siguientes pasos a seguir.
+
+####La última iteración
+
+Dentro de las ideas para mejorar el rendimiento del algoritmo surgieron las siguientes
+
+*Agregar más datos acerca de las características de un equipo tales como % de posesión en temporada pasada, % tiros en el blanco, % de corners, % amarillas etc.
+*Probar mas algoritmos de clasificación como árboles (J48, random tree, random forest) y comprar su efectividad con zeroR
+*Probar el caso de clasificación binaria Win-NoWin
+*Normalizar los datos para ver si existe mejora en los resultados
+*Normalizar respecto a columnas
+*Intentar analizar otros dataset (equipos de europa) con las mismas casas de apuestas para observar que tan buenos comparativamente eran nuestros resultados
+*Intentar reducir la dimensión de las columna para no ahogarnos en vectores de alta dimensionalidad
+
+####Analizando nuevos dataset
+
+En esta iteración se logró conseguir variados dataset con muchas más columnas.  Primero se observo la frecuencia de los diferentes parametros de las columnas (probabilidades de apuestas)
+Se observaron gráficos como el siguiente en el dataset ReducedEurope.csv
+
+![](http://i.imgur.com/5QCCfKA.png)
+
+Se observa que la mayoría tiene una distribución que parte con la mayor de sus valores en 0 y va decreciendo sin embargo existen excepciones como BbOu o BbMx que tienen distribuciones centradas en diferentes valores. Estas distribuciones podrían generar problemas de escala al comparar los diversos valores por esto nace la necesidad de normalizar los valores primero. 
+
+Una vez aplicado normalización por columnas queda
+
+![](http://i.imgur.com/ja4VnsA.png)
+
+Como estos valores están normalizados ahora es posibles compararlos. Y son bastante extraños ya que por ejemplo se observa esta distribución para la columna VCDN
+
+![](http://i.imgur.com/5J80GcA.png)
+
+Donde existe un valor de 20.02551881 es decir está 20 desviaciones estandares sobre el promedio. Lo cual es bastante extraño ya que ocurre en varias de las distribuciones de los datos. Quizás existió un error en el tipeo de los datos?? Quizás existió un cambio de escala en las apuestas en todo este tiempo?? De todas formas la cantidad de datos es ínfima y no debería afectar los resultados.
+Se comparan los resultados para 3 tipos de métodos con J48 uno sin nada, otro con normalizar (todo vector tiene norma 1) y otro con estandarizar (todo valor de la columna pasa a tener promedio 0 y valor de desviaciones estándar) Los resultados fueron los siguientes
+
+(Ver experimentoNormalizacion.kf)
+
+Sin preproceso
+
+![](http://i.imgur.com/6Pl1G4u.png)
+
+Con normalizacion
+
+![](http://i.imgur.com/ZDBwQCL.png)
+
+Con estandarización
+
+![](http://i.imgur.com/IUybXby.png)
+
+####Pruebas sobre reducir la dimensión de los datos
+
+Debido a que se logró conseguir muchas más dimensiones o columnas en esta iteración junto con el siempre presente problema de la dimensionalidad aparece la pregunta ¿Podemos quitar algunas columnas? Cuales?
+
+(ver experimentoDimensionalidad.kf)
+Para esto se experimento con dos métodos atributeSelection y un algoritmo de reducción de dimensionalidad (PCA principal component analysis) frente al método sin ninguno. Los resultados fueron los siguientes
+
+Resultado sin reduccion
+
+![](http://i.imgur.com/cUqgHSv.png)
+
+Resultado con AtributeSelection
+
+![](http://i.imgur.com/bg4Wqpk.png)
+
+Reduccion con reducción de dimensionalidad PCA
+
+![](http://i.imgur.com/wlMfMFG.png)
+
+De estos resultados se observa que el algoritmo Atribute selection logra mejorar algo el resultado. Pero lo aun mas importante baja las columnas a procesar por el algoritmo lo cual lo hace mas rapido. PCA por el otro lado parece que empeora el resultado.
+
+####La metodología final
+
+Ahora con los resultados de la exploración se armó lo siguiente.
+Probar todos los diversos dataset sin una metodología hubiera sido una pesadilla ya que sería casi imposible compararlas objetivamente. Afortunadamente Weka con su herramienta workflow permite armar redes de módulos para realizar tareas tales como preprocesar, filtrar, clasificar y medir los resultados. Se desarrolló la siguiente red.
+
+![](http://i.imgur.com/MmZbSVy.png)
+
+Parece algo compleja, pero en realidad es bastante simple. Se puede entender con los siguientes bloques.
+
+![](http://i.imgur.com/BrBzu0C.png)
+
+En verde se consigue el archivo .csv de entrada, en rojo se consigue que argumento debe utilizarse para clasificar (en este caso FTR full time result) además de realizar la partición de K-fold cross validation, en azul el clasificador. El resto de los nodos a la derecha consiguen el desempeño de un clasificador dado.
+Todas las demás branch corresponden a distintas opciones de métodos, pre procesos. Como son 3 métodos se agrupan en tripletas por cada pre procesos. Es decir se calculan todas las combinaciones de “sin preproceso”, “Normalización”, “Reducir atributos” y en cuando a método están los 3 métodos que dieron mejores resultados en la fase de pruebas de iteración 1, es decir BayesNet, árboles J48 y ZeroR para comparar.
+
+Estos resultados salen a archivos de texto los cuales pueden consultarse fácilmente para verificar que combinacion de metodos-preproceso funciona mejor y además cambia entre un dataset y otro es simplemente configurar el nodo inicial lo que permite la comparación de varios dataset de forma rapida.
+
 ### Resultados
