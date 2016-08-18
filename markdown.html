@@ -60,13 +60,22 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 <div id="descripcion-del-problema" class="section level3">
 <h3>Descripción del Problema</h3>
 <p>Se suele decir que el origen de los deportes yace en los juegos olímpicos originales de Grecia, y desde aquellos tiempos hay evidencia que muestra la existencia de apuestas por los eventos. Ahora mas que nunca la tecnología ha impactado todo ámbito de los deportes, y con el desarrollo de técnicas de minería de datos y el fácil acceso a grandes registros históricos es posible pensar en buscar una manera moderna de predecir resultados.</p>
-<p>Nuestro proyecto está enfocado en la predicción de resultados de partidos de fútbol entre equipos de las mejores ligas o divisiones de países europeos, siendo posibles resultados una victoria del equipo local, una derrota o un empate. Para esto buscamos construir un modelo basado en estadísticas de los equipos, resultados históricos y las cuotas o multiplicadores que ofrecen las casas de apuestas.</p>
+<p>Nuestro proyecto está enfocado en la predicción de resultados de partidos de fútbol dados resultados históricos y las cuotas o multiplicadores que ofrecen las casas de apuestas.</p>
+<p>De manera inicial se trabaja con esta idea en mente, frente a lo cual se toman diversas consideraciones:</p>
+<ol style="list-style-type: decimal">
+<li><p>Se decide trabajar con los datos existentes de las ligas Europeas, dado que por el alto interés que existe por este deporte en dicho Continente, el nivel de datos presente es mayor que al de otras ligas.</p></li>
+<li><p>Se busca predecir un resultado de tipo Victoria/Derrota para el equipo local dado los equipos Local y Visita. Dado esto, se considera el resultado Empate como Derrota para el equipo Local Dado este último punto, se busca obtener una probabilidad superior al 50% para poder conseguir una mejora frente a un sistema básico de predicción (Como lo es ZeroR, por ejemplo).</p></li>
+</ol>
+<p>Posteriormente, dada la incorporación de datos a explicar en los puntos siguientes, se considera interesante el observar los partidos de fútbol que posean probabilidades inusuales, además de investigar las razones de la ocurrencia de estos hechos.</p>
 </div>
 <div id="descripcion-de-los-datos" class="section level3">
 <h3>Descripción de los datos</h3>
 <p>Una gran cantidad de los datos usados provienen de <a href="http://www.football-data.co.uk">http://www.football-data.co.uk</a>, un sitio que tiene archivos en csv por cada año y cada liga o división de varios países europeos. Dentro de los csv cada fila corresponde a un partido y cada columna a un atributo del partido, donde la mayoría son datos de casas de apuestas.</p>
+<p>Finalmente, se busca añadir datos estadísticos de los equipos de Fútbol, es decir los datos promedios de temporadas previas, tales como los Tiros promedio por juego, cuántos de estos poseen acierto, tarjetas Amarillas y Rojas promedio, etc.</p>
+<p>Finalmente, se busca añadir datos estadísticos de los equipos de Fútbol, es decir los datos promedios de temporadas previas, tales como los Tiros promedio por juego, cuántos de estos poseen acierto, tarjetas Amarillas y Rojas promedio, etc.</p>
+<p>Para esto, se recolectan datos de diversos sitios dedicados a tal tarea, tales como WhoScored, FootStats, Football-Data, etc., pero pronto se hace notorio que existe una flagrante inconsistencia en los datos, desde incongruencia de datos entre sitios hasta la falta de los mismos en otros.</p>
+<p>Dado esto, se rescatan las estadísticas de FootStats, la cual posee mayoritariamente datos de las ligas Inglesa, Francesa, Italiana, Alemana y Española de Alta y Media división, frente a sus sitios competidores que poseen sólo información de las ligas menores. Finalmente, estos datos se añaden a los dataset por países en los cuales se tiene información, y se evita añadir datos de otros sitios para evitar la inconsistencia y poco porcentaje de datos estadísticos.</p>
 <p>Los datos usados pueden pueden ser descargados de <a href="https://github.com/LucasCabello/DM/tree/master/datos">aquí</a>.</p>
-<p><span style="color:red">****TODO: AGREGAR LOS DATOS QUE FALTAN AL REPOSITORIO Y LAS EXPLICACIONES****</span></p>
 </div>
 <div id="limpieza-de-datos" class="section level3">
 <h3>Limpieza de datos</h3>
