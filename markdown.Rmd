@@ -292,3 +292,19 @@ En este dataset se agregan al dataset del desafío 2 de la serie A italiana una 
 ![](http://i.imgur.com/VIDawFm.png)
 
 Se observa otra vez que el algoritmo BayerNet gana en % de correctamente clasificador, lo intentesante es que ahora el arbol J48 esta mucho mas a la par y bayes falla en el caso SinPreproceso. Bastante en metricas como porcCC, H recall o D roc area.
+
+####ReducedEngland
+
+En algunas de las observaciones de la iteración anterior se nos pidió contrastar nuestros datos con un dataset de otra liga de futbol se eligió la liga inglesa de futbol (un mix de todas). Y se espera obtener resultados similares ya que los datos son los mismos (estadísticas equipos, casas de apuestas)
+
+![](http://i.imgur.com/BOT6sOg.png)
+
+El comportamiento como se esperaba es bastante similar, lo único que cambia es que bayes, j48 parecen comportarse muy similarmente sea cual sea el preproceso.
+
+####ReducedEuropa3Classes
+
+Por último como desafío final se decidió usar un dataset de toda europa (mixs de diferentes ligas) y observar el desempeño del modelo propuesto.
+
+![](http://i.imgur.com/wBnoRTY.png)
+
+Se observa que el desempeño bajo algo está por el 47 %. Además los distintos métodos de preproceso no tienen una gran incidencia en el resultado al parecer es notoria la mayor dificultad de generalizar a todo el continente. 
